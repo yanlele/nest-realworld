@@ -9,7 +9,7 @@ import {UserEntity} from './user.entity';
 import {CreateUserDto, LoginUserDto} from './dto';
 import * as crypto from 'crypto';
 import {UserRo} from './user.interface';
-import {validate} from "class-validator";
+import {validate} from 'class-validator';
 
 export class UserService {
   constructor(@InjectRepository(UserEntity)
@@ -50,7 +50,7 @@ export class UserService {
     if (errors.length > 0) {
       throw new HttpException({
         message: 'Input data validation failed',
-        errors: this.buildError(errors)
+        errors: this.buildError(errors),
       }, HttpStatus.BAD_REQUEST);
     } else {
       const savedUser = await this.userRepository.save(newUser);
@@ -74,8 +74,7 @@ export class UserService {
       username: user.username,
       email: user.email,
       bio: user.bio,
-      token: this.generateJWT(user),
-      image: user.image
+      image: user.image,
     };
 
     return {user: userRO};
