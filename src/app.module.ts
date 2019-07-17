@@ -6,7 +6,7 @@ import {Connection} from 'typeorm';
 @Module({
   imports: [
     TypeOrmModule.forRoot(),
-    UserModule
+    UserModule,
   ],
   controllers: [],
   providers: [],
