@@ -2,12 +2,14 @@
  * create by yanle
  * create time 2019/7/17 10:24 PM
  */
-import {Injectable} from '@nestjs/common';
+import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
-import {Repository} from 'typeorm';
+import {getRepository, Repository} from 'typeorm';
 import {UserEntity} from './user.entity';
 import {CreateUserDto, LoginUserDto} from './dto';
 import * as crypto from 'crypto';
+import {UserRo} from './user.interface';
+import {validate} from "class-validator";
 
 export class UserService {
   constructor(@InjectRepository(UserEntity)
@@ -24,5 +26,58 @@ export class UserService {
       password: crypto.createHmac('sha256', loginUser.password).digest('hex'),
     };
     return await this.userRepository.findOne(findOneOptions);
+  }
+
+  async create(createUser: CreateUserDto): Promise<UserRo> {
+    const {username, email, password} = createUser;
+    const qb = await getRepository(UserEntity)
+      .createQueryBuilder('user')
+      .where('user.username = :username', {username})
+      .orWhere('user.email = :email', {email});
+
+    const user = await qb.getOne();
+    if (user) {
+      const errors = {username: '用户名或者邮箱不能有重复'};
+      throw new HttpException({message: '输入错误', errors}, HttpStatus.BAD_REQUEST);
+    }
+
+    const newUser = new UserEntity();
+    newUser.username = username;
+    newUser.email = email;
+    newUser.password = password;
+
+    const errors = await validate(newUser);
+    if (errors.length > 0) {
+      throw new HttpException({
+        message: 'Input data validation failed',
+        errors: this.buildError(errors)
+      }, HttpStatus.BAD_REQUEST);
+    } else {
+      const savedUser = await this.userRepository.save(newUser);
+      return this.buildUserRO(savedUser);
+    }
+  }
+
+  private buildError(errors) {
+    const result = {};
+    errors.forEach(el => {
+      const prop = el.property;
+      Object.entries(el.constraints).forEach(constraint => {
+        result[prop + constraint[0]] = `${constraint[1]}`;
+      });
+    });
+    return result;
+  }
+
+  private buildUserRO(user: UserEntity) {
+    const userRO = {
+      username: user.username,
+      email: user.email,
+      bio: user.bio,
+      token: this.generateJWT(user),
+      image: user.image
+    };
+
+    return {user: userRO};
   }
 }
