@@ -11,6 +11,7 @@ import * as crypto from 'crypto';
 import {UserRo} from './user.interface';
 import {validate} from 'class-validator';
 
+@Injectable()
 export class UserService {
   constructor(@InjectRepository(UserEntity)
               private readonly userRepository: Repository<UserEntity>) {
