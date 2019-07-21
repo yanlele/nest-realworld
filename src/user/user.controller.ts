@@ -5,15 +5,23 @@
 import {Body, Controller, Get, Post} from '@nestjs/common';
 import {UserService} from './user.service';
 import {CreateUserDto} from './dto';
+import {responseSuccessData, StandResponse} from '../utils/standResponse';
+import {UserRo} from './user.interface';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {
   }
 
+  @Get()
+  async findMe(@Body('email') email: string): Promise<StandResponse<UserRo>> {
+    return responseSuccessData(await this.userService.findByEmail(email));
+  }
+
   @Post()
-  async create(@Body('user') userData: CreateUserDto) {
-    return this.userService.create(userData);
+  async create(@Body('user') userData: CreateUserDto): Promise<StandResponse<UserRo>> {
+    const user = await this.userService.create(userData);
+    return responseSuccessData(user);
   }
 
   @Get('test')

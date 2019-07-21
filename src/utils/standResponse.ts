@@ -16,7 +16,7 @@ interface StandResponseError {
   success: boolean;
 }
 
-export function responseSuccessData(data, message: string = '请求成功') {
+export function responseSuccessData<T>(data, message: string = '请求成功'): StandResponseSuccess<T> {
   return {
     data,
     message,
@@ -28,5 +28,5 @@ export function responseError(message: string = '请求失败') {
   return {
     message,
     success: false,
-  }
-};
+  };
+}

@@ -82,6 +82,13 @@ export class UserService {
     return this.buildUserRO(user);
   }
 
+  async findByEmail(email: string): Promise<UserRo> {
+    const user = await this.userRepository.findOne({email});
+    return this.buildUserRO(user);
+  }
+
+  // todo 生成jwt
+
   private buildError(errors) {
     const result = {};
     errors.forEach(el => {
