@@ -4,7 +4,7 @@
  */
 import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
-import {getRepository, Repository} from 'typeorm';
+import {DeleteResult, getRepository, Repository} from 'typeorm';
 import {UserEntity} from './user.entity';
 import {CreateUserDto, LoginUserDto, UpdateUserDto} from './dto';
 import * as crypto from 'crypto';
@@ -67,6 +67,10 @@ export class UserService {
 
     const updated = Object.assign(toUpdate, user);
     return await this.userRepository.save(updated);
+  }
+
+  async delete(email: string): Promise<DeleteResult> {
+    return await this.userRepository.delete({email});
   }
 
   private buildError(errors) {
