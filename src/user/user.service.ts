@@ -73,6 +73,15 @@ export class UserService {
     return await this.userRepository.delete({email});
   }
 
+  async findById(id: number): Promise<UserRo> {
+    const user = await this.userRepository.findOne(id);
+    if (!user) {
+      const errors = {user: 'not found'};
+      throw new HttpException({errors}, 401);
+    }
+    return this.buildUserRO(user);
+  }
+
   private buildError(errors) {
     const result = {};
     errors.forEach(el => {
