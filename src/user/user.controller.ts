@@ -2,7 +2,7 @@
  * create by yanle
  * create time 2019/7/13 5:16 PM
  */
-import {Body, Controller, Get, Post} from '@nestjs/common';
+import {Body, Controller, Get, Post, Query} from '@nestjs/common';
 import {UserService} from './user.service';
 import {CreateUserDto} from './dto';
 import {responseSuccessData, StandResponse} from '../utils/standResponse';
@@ -14,7 +14,7 @@ export class UserController {
   }
 
   @Get()
-  async findMe(@Body('email') email: string): Promise<StandResponse<UserRo>> {
+  async findMe(@Query('email') email: string): Promise<StandResponse<UserRo>> {
     return responseSuccessData(await this.userService.findByEmail(email));
   }
 
