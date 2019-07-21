@@ -6,7 +6,7 @@ import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {getRepository, Repository} from 'typeorm';
 import {UserEntity} from './user.entity';
-import {CreateUserDto, LoginUserDto} from './dto';
+import {CreateUserDto, LoginUserDto, UpdateUserDto} from './dto';
 import * as crypto from 'crypto';
 import {UserRo} from './user.interface';
 import {validate} from 'class-validator';
@@ -57,6 +57,16 @@ export class UserService {
       const savedUser = await this.userRepository.save(newUser);
       return this.buildUserRO(savedUser);
     }
+  }
+
+  async update(id: number, user: UpdateUserDto): Promise<UserEntity> {
+    const toUpdate = await this.userRepository.findOne(id);
+
+    delete toUpdate.password;
+    // todo remove favorites
+
+    const updated = Object.assign(toUpdate, user);
+    return await this.userRepository.save(updated);
   }
 
   private buildError(errors) {
