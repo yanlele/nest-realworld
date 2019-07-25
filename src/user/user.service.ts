@@ -65,6 +65,10 @@ export class UserService {
     delete toUpdate.password;
     // todo remove favorites
 
+    if (toUpdate.username === user.username || toUpdate.email === user.email) {
+      throw new HttpException({errors: '用户名或者邮箱已经存在'}, HttpStatus.BAD_REQUEST);
+    }
+
     const updated = Object.assign(toUpdate, user);
     return await this.userRepository.save(updated);
   }
